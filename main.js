@@ -1,3 +1,5 @@
+'use strict'
+
 const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const autoUpdater = require("electron-updater").autoUpdater;
 const path = require('path');
@@ -9,13 +11,19 @@ const ncp = require('ncp');
 const request = require('request');
 const alltomp3 = require('alltomp3');
 const VERSION = app.getVersion();
-let DEV = false;
-if (process.env.ALLTOMP3_DEV == '1') {
-  DEV = true;
+
+let DEV_TOOLS = false;
+if (process.env.ALLTOMP3_DEVTOOLS == '1') {
+  DEV_TOOLS = true;
+}
+
+let LOCAL_FRONTEND = false;
+if (process.env.ALLTOMP3_LOCALFRONTEND == '1') {
+  LOCAL_FRONTEND = true;
 }
 
 // autoUpdater
-if (!DEV && os.platform() != 'linux') {
+if (!DEV_TOOLS && os.platform() != 'linux') {
   autoUpdater.checkForUpdates();
 }
 
@@ -284,7 +292,7 @@ ipcMain.on('feedback.launch', (event, infos) => {
   }));
 
   // Open the DevTools.
-  if (DEV) {
+  if (DEV_TOOLS){
     feedbackWin.webContents.openDevTools();
   }
 
@@ -483,7 +491,7 @@ function createWindow () {
   win = new BrowserWindow({width: 400, height: 700})
 
   // and load the index.html of the app.
-  if (DEV) {
+  if (LOCAL_FRONTEND) {
     win.loadURL('http://localhost:4200');
   } else {
     win.loadURL(url.format({
@@ -494,7 +502,7 @@ function createWindow () {
   }
 
   // Open the DevTools.
-  if (DEV) {
+  if (DEV_TOOLS) {
     win.webContents.openDevTools();
   }
 
